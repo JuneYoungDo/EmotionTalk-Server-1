@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostUserReq {
+public class PostLoginReq {
     private String name;
     private String password;
 }

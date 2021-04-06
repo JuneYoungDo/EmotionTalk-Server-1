@@ -1,7 +1,5 @@
 package com.spring.emotionTalk.src.user;
 
-
-
 import com.spring.emotionTalk.config.BaseException;
 import com.spring.emotionTalk.config.secret.Secret;
 import com.spring.emotionTalk.src.user.model.*;
@@ -40,11 +38,11 @@ public class UserService {
 
     }
 
-    //POST
+    // creatUser
     public PostUserRes createUser(PostUserReq postUserReq) throws BaseException {
         //중복
-        if(userProvider.checkEmail(postUserReq.getEmail()) ==1){
-            throw new BaseException(POST_USERS_EXISTS_EMAIL);
+        if(userProvider.checkName(postUserReq.getName()) ==1){
+            throw new BaseException(POST_USER_EXISTS_NAME);
         }
 
         String pwd;
@@ -58,8 +56,6 @@ public class UserService {
 
         int userIdx = userDao.createUser(postUserReq);
 
-        //jwt발급
-        String jwt = jwtService.createJwt(userIdx);
-        return new PostUserRes(jwt,userIdx);
+        return new PostUserRes(userIdx);
     }
 }

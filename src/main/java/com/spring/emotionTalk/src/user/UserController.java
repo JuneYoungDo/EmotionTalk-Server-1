@@ -67,25 +67,47 @@ public class UserController {
 
     /**
      * 회원가입 API
-     * [POST] /users
+     * [POST] /user
      * @return BaseResponse<PostUserRes>
      */
     // Body
     @ResponseBody
-    @PostMapping("")
+    @PostMapping("/user")
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) throws BaseException {
-        if(postUserReq.getEmail() == null){
-            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        if(postUserReq.getName() == null){
+            return new BaseResponse<>(POST_USER_EMPTY_NAME);
         }
-        //이메일 정규표현
-        if(!isRegexEmail(postUserReq.getEmail())){
-            return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
+        if(postUserReq.getPassword() == null){
+            return new BaseResponse<>(POST_USER_EMPTY_PWD);
         }
         try{
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 로그인 API
+     * [POST] /user/login
+     * @return BaseResponse<PostUserRes>
+     */
+    @ResponseBody
+    @PostMapping("/user/login")
+    public BaseResponse<PostLoginRes> login(@RequestBody PostLoginReq postLoginReq) throws BaseException {
+        try{
+            if(postLoginReq.getName() == null) {
+                return new BaseResponse<>(POST_USER_EMPTY_NAME);
+            }
+            if(postLoginReq.getPassword() == null) {
+                return new BaseResponse<>(POST_USER_EMPTY_PWD);
+            }
+            PostLoginRes postLoginRes = userProvider.login(postLoginReq);
+            return new BaseResponse<>(postLoginRes);
+
+        }catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
         }
     }
 
