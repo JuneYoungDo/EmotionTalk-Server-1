@@ -24,11 +24,18 @@ public enum BaseResponseStatus {
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
-    // [POST] /users
+    // [POST] /user
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
     POST_USERS_EXISTS_EMAIL(false,2017,"중복된 이메일입니다."),
-    POST_USER_EMPTY_NAME(false,2018,"이름을 입력해주세요."),
+    POST_USER_EXISTS_NAME(false,2018,"중복된 name 입니다."),
+
+    // [POST] /user/login
+    POST_USER_EMPTY_NAME(false,2019,"이름을 입력해주세요."),
+    POST_USER_EMPTY_PWD(false,2020,"비밀번호를 입력해주세요."),
+    USER_IS_NOT_AVAILABLE(false,2021,"삭제된 계정입니다."),
+    FAILED_TO_LOGIN(false,2022,"정보가 일치하지 않습니다."),
+
 
 
     /**

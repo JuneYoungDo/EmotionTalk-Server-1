@@ -43,8 +43,8 @@ public class UserDao {
 
 
     public int createUser(PostUserReq postUserReq){
-        this.jdbcTemplate.update("insert into UserInfo (userName, ID, password, email) VALUES (?,?,?,?)",
-                new Object[]{postUserReq.getUserName(), postUserReq.getId(), postUserReq.getPassword(), postUserReq.getEmail(),}
+        this.jdbcTemplate.update("INSERT INTO `realTalk`.`user` (`name`, `pwd`) VALUES (?, ?);",
+                new Object[]{postUserReq.getName(), postUserReq.getPassword(),}
         );
         return this.jdbcTemplate.queryForObject("select last_insert_id()",int.class);
     }
@@ -54,6 +54,28 @@ public class UserDao {
                 int.class,
                 email);
 
+    }
+    public int checkName(String name){
+        return this.jdbcTemplate.queryForObject("select exists(select name from user where name = ?)",
+                int.class,
+                name);
+
+    }
+    public User getPwd(PostLoginReq postLoginReq){
+
+        String getPwdQuery = "select userKey,name, pwd,photoUrl,isDeleted from user where name = ?;";
+        String getPwdParams = postLoginReq.getName();
+
+        return this.jdbcTemplate.queryForObject(getPwdQuery,
+                (rs, rowNum) -> new User(
+                        rs.getInt("userKey"),
+                        rs.getString("name"),
+                        rs.getString("pwd"),
+                        rs.getString("photoUrl"),
+                        rs.getString("isDeleted")
+                ),
+                getPwdParams
+        );
     }
 
 
