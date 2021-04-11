@@ -7,8 +7,10 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostLoginRes {
-    public PostLoginRes() {};
-    private int userKey;
-    private String jwt;
+public class GoogleUserReq {
+    public GoogleUserReq(){}
+
+    private String id;
+    private String email;
+    private String name;
 }

@@ -80,4 +80,15 @@ public class UserProvider {
             throw new BaseException(BaseResponseStatus.USER_IS_NOT_AVAILABLE);
     }
 
+    public int checkGoogleEmail(String googleEmail) {
+        return userDao.checkGoogleEmail(googleEmail);
+    }
+
+    public PostLoginRes logIn(String googleEmail) throws BaseException{
+        int userKey = userDao.getUserKeyByGoogleEmail(googleEmail);
+        String jwt = jwtService.createJwt(userKey);
+
+        return new PostLoginRes(userKey, jwt);
+    }
+
 }

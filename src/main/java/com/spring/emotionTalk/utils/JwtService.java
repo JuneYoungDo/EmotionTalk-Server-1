@@ -24,10 +24,10 @@ public class JwtService {
     @param userIdx
     @return String
      */
-    public String createJwt(int userIdx){
+    public String createJwt(int userKey){
         Date now = new Date();
         return Jwts.builder()
-                .claim("userIdx",userIdx)
+                .claim("userKey",userKey)
                 .setIssuedAt(now)
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
                 .compact();
@@ -47,7 +47,7 @@ public class JwtService {
     @return int
     @throws BaseException
      */
-    public int getUserId() throws BaseException{
+    public int getUserKey() throws BaseException{
         //1. JWT 추출
         String accessToken = getJwt();
         if(accessToken == null || accessToken.length() == 0){
@@ -65,7 +65,7 @@ public class JwtService {
         }
 
         // 3. userIdx 추출
-        return claims.getBody().get("userIdx",Integer.class);
+        return claims.getBody().get("userKey",Integer.class);
     }
 
 }

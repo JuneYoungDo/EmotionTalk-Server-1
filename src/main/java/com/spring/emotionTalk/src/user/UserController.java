@@ -1,6 +1,8 @@
     package com.spring.emotionTalk.src.user;
 
-import com.fasterxml.jackson.databind.ser.Serializers;
+import com.spring.emotionTalk.src.auth.dto.AuthDto;
+import com.spring.emotionTalk.src.auth.helper.constants.SocialLoginType;
+import com.spring.emotionTalk.src.auth.service.OauthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.spring.emotionTalk.config.BaseException;
@@ -10,16 +12,19 @@ import com.spring.emotionTalk.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 
 import static com.spring.emotionTalk.config.BaseResponseStatus.*;
-import static com.spring.emotionTalk.utils.ValidationRegex.isRegexEmail;
 
 @RestController
-@RequestMapping("/app/users")
+@RequestMapping("/app")
 public class UserController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final OauthService oauthService;
 
     @Autowired
     private final UserProvider userProvider;
@@ -28,7 +33,8 @@ public class UserController {
     @Autowired
     private final JwtService jwtService;
 
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService){
+    public UserController(OauthService oauthService, UserProvider userProvider, UserService userService, JwtService jwtService){
+        this.oauthService = oauthService;
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
@@ -43,7 +49,7 @@ public class UserController {
      */
     //Query String
     @ResponseBody
-    @GetMapping("") // (GET) 127.0.0.1:9000/app/users           @RequestParam = 쿼리스트링 받아옴
+    @GetMapping("/users") // (GET) 127.0.0.1:9000/app/users           @RequestParam = 쿼리스트링 받아옴
                                             //                  required = false => 쿼리스트링 안받아도 오류 x
     public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String Email) {
         // Get Users
@@ -58,7 +64,7 @@ public class UserController {
      */
     // Path-variable
     @ResponseBody
-    @GetMapping("/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
+    @GetMapping("/user/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
     public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
         // Get Users
         GetUserRes getUserRes = userProvider.getUser(userIdx);
@@ -111,5 +117,48 @@ public class UserController {
         }
     }
 
+    /**
+     * 소셜 로그인 API
+     * [POST] /{socialLoginType}/login
+     * @param socialLoginType (GOOGLE, KAKAO)
+     * @return BaseResponse<postLoginRes>
+     */
+    @ResponseBody
+    @PostMapping("/{socialLoginType}/login")
+    public BaseResponse<PostLoginRes> getInfo(
+            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
+            @RequestParam(name = "id_token") String idToken) throws BaseException, GeneralSecurityException, IOException {
 
+        if (idToken == "") {
+            return new BaseResponse<>(EMPTY_ID_TOKEN);
+        } else {
+            AuthDto.GoogleProfileRes googleProfileRes = oauthService.loadInfo(socialLoginType, idToken);
+
+            GoogleUserReq googleUserReq = new GoogleUserReq();
+
+            googleUserReq.setId(googleProfileRes.getId());
+            googleUserReq.setEmail(googleProfileRes.getEmail());
+            googleUserReq.setName(googleProfileRes.getName());
+
+            PostLoginRes postLoginRes = new PostLoginRes();
+            if (userService.findUserByGoogleEmail(googleUserReq.getEmail()) == 1) {
+                System.out.println("loginUser");
+                try {
+                    postLoginRes = userProvider.logIn(googleUserReq.getEmail());
+                    return new BaseResponse<>(postLoginRes);
+                } catch (BaseException exception) {
+                    return new BaseResponse<>(exception.getStatus());
+                }
+            } else {
+                System.out.println("createUser");
+                try {
+                    postLoginRes = userService.createUserByGoogle(googleUserReq);
+                    return new BaseResponse<>(postLoginRes);
+                } catch (BaseException exception) {
+                    return new BaseResponse<>(exception.getStatus());
+                }
+            }
+
+        }
+    }
 }

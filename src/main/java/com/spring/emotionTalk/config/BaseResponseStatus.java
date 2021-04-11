@@ -35,6 +35,7 @@ public enum BaseResponseStatus {
     POST_USER_EMPTY_PWD(false,2020,"비밀번호를 입력해주세요."),
     USER_IS_NOT_AVAILABLE(false,2021,"삭제된 계정입니다."),
     FAILED_TO_LOGIN(false,2022,"정보가 일치하지 않습니다."),
+    EMPTY_ID_TOKEN(false,2030,"ID_TOKEN이 없습니다."),
 
 
 
