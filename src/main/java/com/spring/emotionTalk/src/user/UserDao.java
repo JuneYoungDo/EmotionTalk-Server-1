@@ -49,6 +49,28 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject("select last_insert_id()",int.class);
     }
 
+    public int createUser(GoogleUserReq googleUserReq){
+        this.jdbcTemplate.update("insert into user (name,googleId,email) VALUES (?,?,?)",
+                new Object[]{
+                        googleUserReq.getName(),
+                        googleUserReq.getId(),
+                        googleUserReq.getEmail()}
+        );
+        return this.jdbcTemplate.queryForObject("select last_insert_id()",int.class);
+    }
+
+    public int checkGoogleEmail(String googleEmail) {
+        return this.jdbcTemplate.queryForObject("select exists(select email from user where email = ?)",
+                int.class, googleEmail);
+    }
+
+    public int getUserKeyByGoogleEmail(String googleEmail) {
+        String query = "select userKey from user where email = ?";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, googleEmail);
+    }
+
+
     public int checkEmail(String email){
         return this.jdbcTemplate.queryForObject("select exists(select email from UserInfo where email = ?)",
                 int.class,

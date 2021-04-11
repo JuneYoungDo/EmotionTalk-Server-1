@@ -14,7 +14,8 @@ Secret.java
 gradlew
 gradlew.bat
 README.md
-
+/logs/
+/src/main/resources
 # Created by https://www.toptal.com/developers/gitignore/api/java,intellij,gradle,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=java,intellij,gradle,windows
 

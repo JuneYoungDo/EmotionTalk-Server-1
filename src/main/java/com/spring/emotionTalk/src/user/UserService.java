@@ -58,4 +58,25 @@ public class UserService {
 
         return new PostUserRes(userIdx);
     }
+
+
+    //POST
+    public PostLoginRes createUserByGoogle(GoogleUserReq googleUserReq) throws BaseException {
+        try {
+            int userKey = userDao.createUser(googleUserReq);
+
+            String jwt = jwtService.createJwt(userKey);
+            return new PostLoginRes(userKey, jwt);
+        }catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int findUserByGoogleEmail(String googleEmail) {
+        if(userProvider.checkGoogleEmail(googleEmail) ==1){
+            return 1;
+        }
+        return 0;
+    }
+
 }
