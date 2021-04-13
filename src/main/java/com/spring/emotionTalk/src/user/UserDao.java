@@ -59,8 +59,15 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject("select last_insert_id()",int.class);
     }
 
+    public void insertRefreshToken(int userKey,String refreshToken){
+        this.jdbcTemplate.update("UPDATE user SET refreshToken = ? WHERE (userKey = ?);",
+                new Object[]{
+                        refreshToken,userKey}
+        );
+    }
+
     public int checkGoogleEmail(String googleEmail) {
-        return this.jdbcTemplate.queryForObject("select exists(select email from user where email = ?)",
+        return this.jdbcTemplate.queryForObject("select exists(select email from user where email = ? and isDeleted = 'N')",
                 int.class, googleEmail);
     }
 
