@@ -7,8 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostLoginRes {
-    public PostLoginRes() {} ;
-    private String jwt;
-    private String refreshToken;
+public class GoogleLoginReq {
+    private String idToken;
+    public GoogleLoginReq() {}
 }

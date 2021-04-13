@@ -9,7 +9,7 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.spring.emotionTalk.config.BaseResponse;
 import com.spring.emotionTalk.src.auth.dto.AuthDto;
 import com.spring.emotionTalk.src.user.model.PostLoginRes;
-import com.sun.javafx.collections.MappingChange;
+import io.swagger.models.Model;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -29,6 +29,8 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 
+import javax.jws.WebParam;
+
 @Component
 @RequiredArgsConstructor
 public class GoogleOauth implements SocialOauth {
@@ -47,7 +49,7 @@ public class GoogleOauth implements SocialOauth {
     @Override
     public String getOauthRedirectURL() {
         Map<String,Object> params = new HashMap<>();
-        params.put("scope","profile");
+        params.put("scope","email%20profile%20openid");
         params.put("response_type","code");
         params.put("client_id",GOOGLE_SNS_CLIENT_ID);
         params.put("redirect_uri",GOOGLE_SNS_CALLBACK_URL);
@@ -117,7 +119,7 @@ public class GoogleOauth implements SocialOauth {
             name = (String) payload.get("name");
 
 
-            boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
+          //  boolean emailVerified = Boolean.valueOf(payload.getEmailVerified());
             String pictureUrl = (String) payload.get("picture");
             String locale = (String) payload.get("locale");
             String familyName = (String) payload.get("family_name");

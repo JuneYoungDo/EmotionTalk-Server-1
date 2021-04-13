@@ -46,13 +46,11 @@ public class OauthController {
     @GetMapping("/{socialLoginType}/callback")
     public String callBack(
             @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
-            @RequestParam(name = "code") String code,
-            @RequestParam(name = "scope") String scope) {
+            @RequestParam(name = "code") String code) {
 
         logger.warn(">> 소셜 로그인 API 서버로부터 받은 socialType :: {}", socialLoginType);
         logger.warn(">> 소셜 로그인 API 서버로부터 받은 code :: {}", code);
 
-        String realCode = code + "&scope" + scope ;
 
         return oauthService.requestAccessToken(socialLoginType,code);
     }

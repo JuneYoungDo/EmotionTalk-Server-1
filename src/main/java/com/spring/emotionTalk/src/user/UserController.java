@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -117,22 +118,32 @@ public class UserController {
         }
     }
 
+    /*@ResponseBody
+    @GetMapping("/jwt/test")
+    public boolean testJWT() throws BaseException, UnsupportedEncodingException {
+        boolean flag;
+        flag = jwtService.verifyJWT(jwtService.getJwt());
+        System.out.println(flag);
+        return flag;
+    }*/
+
+
     /**
      * 소셜 로그인 API
      * [POST] /{socialLoginType}/login
      * @param socialLoginType (GOOGLE, KAKAO)
-     * @return BaseResponse<postLoginRes>
      */
     @ResponseBody
     @PostMapping("/{socialLoginType}/login")
     public BaseResponse<PostLoginRes> getInfo(
-            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType,
-            @RequestParam(name = "id_token") String idToken) throws BaseException, GeneralSecurityException, IOException {
-
-        if (idToken == "") {
+            @RequestBody GoogleLoginReq googleLoginReq,
+            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType) throws GeneralSecurityException, IOException {
+        String token = googleLoginReq.getIdToken();
+        if (token == "") {
             return new BaseResponse<>(EMPTY_ID_TOKEN);
         } else {
-            AuthDto.GoogleProfileRes googleProfileRes = oauthService.loadInfo(socialLoginType, idToken);
+
+            AuthDto.GoogleProfileRes googleProfileRes = oauthService.loadInfo(socialLoginType, token);
 
             GoogleUserReq googleUserReq = new GoogleUserReq();
 
@@ -145,7 +156,7 @@ public class UserController {
                 System.out.println("loginUser");
                 try {
                     postLoginRes = userProvider.logIn(googleUserReq.getEmail());
-                    return new BaseResponse<>(postLoginRes);
+                    return new BaseResponse<>(postLoginRes.getJwt(),postLoginRes.getRefreshToken());
                 } catch (BaseException exception) {
                     return new BaseResponse<>(exception.getStatus());
                 }
@@ -153,12 +164,13 @@ public class UserController {
                 System.out.println("createUser");
                 try {
                     postLoginRes = userService.createUserByGoogle(googleUserReq);
-                    return new BaseResponse<>(postLoginRes);
+                    return new BaseResponse<>(postLoginRes.getJwt(), postLoginRes.getRefreshToken());
                 } catch (BaseException exception) {
                     return new BaseResponse<>(exception.getStatus());
                 }
             }
-
         }
     }
+
+
 }

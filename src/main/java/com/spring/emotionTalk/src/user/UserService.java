@@ -66,7 +66,11 @@ public class UserService {
             int userKey = userDao.createUser(googleUserReq);
 
             String jwt = jwtService.createJwt(userKey);
-            return new PostLoginRes(userKey, jwt);
+            String refreshToken = jwtService.createRefreshToken(userKey);
+
+            userDao.insertRefreshToken(userKey,refreshToken);
+
+            return new PostLoginRes(jwt,refreshToken);
         }catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

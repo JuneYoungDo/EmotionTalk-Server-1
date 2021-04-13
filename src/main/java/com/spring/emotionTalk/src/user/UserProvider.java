@@ -70,7 +70,8 @@ public class UserProvider {
             {
                    int userKey = userDao.getPwd(postLoginReq).getUserKey();
                    String jwt = jwtService.createJwt(userKey);
-                   return new PostLoginRes(userKey,jwt);
+                   String refreshToken = jwtService.createRefreshToken(userKey);
+                   return new PostLoginRes(jwt,refreshToken);
             }
             else{
                 throw new BaseException(BaseResponseStatus.USER_IS_NOT_AVAILABLE);
@@ -84,11 +85,16 @@ public class UserProvider {
         return userDao.checkGoogleEmail(googleEmail);
     }
 
+
     public PostLoginRes logIn(String googleEmail) throws BaseException{
         int userKey = userDao.getUserKeyByGoogleEmail(googleEmail);
-        String jwt = jwtService.createJwt(userKey);
 
-        return new PostLoginRes(userKey, jwt);
+        String jwt = jwtService.createJwt(userKey);
+        String refreshToken = jwtService.createRefreshToken(userKey);
+
+        userDao.insertRefreshToken(userKey,refreshToken);
+
+        return new PostLoginRes(jwt,refreshToken);
     }
 
 }
