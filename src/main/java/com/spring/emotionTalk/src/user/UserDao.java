@@ -103,6 +103,44 @@ public class UserDao {
         return this.jdbcTemplate.update(patchMyProfileQuery,patchMyProfileParams);
     }
 
+    public int isValidUserKey(int userKey) {
+        String isValidUserKeyQuery = "select exists(select userKey from user where userKey = ?);";
+        return this.jdbcTemplate.queryForObject(isValidUserKeyQuery,int.class,userKey);
+    }
 
+    public int isExistFriendList(int userKey, int anotherKey){
+        String isExistFriendList = "select exists(select userKey from friendList where userKey = ? and anotherKey = ?);";
+        return this.jdbcTemplate.queryForObject(isExistFriendList,int.class,userKey,anotherKey);
+    }
+    public void postFriendList(int userKey,int anotherKey){
+        String postFriendList = "insert into friendList (userKey,anotherKey) values (?,?);";
+        this.jdbcTemplate.update(postFriendList,new Object[]{userKey,anotherKey});
+    }
+    public char isDeletedFriend(int userKey,int anotherKey){
+        String isDeletedFriend = "select isDeleted from friendList where userKey = ? and anotherKey = ?;";
+        return this.jdbcTemplate.queryForObject(isDeletedFriend,char.class,userKey,anotherKey);
+    }
+    public void chmodFriendList(int userKey,int anotherKey){
+        char c = isDeletedFriend(userKey,anotherKey);
+        String chmodFriendList;
+        if(c == 'Y'){
+            chmodFriendList = "UPDATE friendList SET isDeleted = 'N' WHERE userKey = ? and anotherKey = ?;";
+        }
+        else{
+            chmodFriendList = "UPDATE friendList SET isDeleted = 'Y' WHERE userKey = ? and anotherKey = ?;";
+        }
+        this.jdbcTemplate.update(chmodFriendList,userKey,anotherKey);
+    }
+    public List<GetUserFriendListRes> getUserFriendList(int userKey){
+        String getUserFriendListQuery = "select anotherKey, name from friendList, user " +
+                "where friendList.anotherKey = user.userKey and friendList.userKey = ?;";
 
+        return this.jdbcTemplate.query(getUserFriendListQuery,
+                (rs, rowNum) -> new GetUserFriendListRes(
+                        rs.getInt("anotherKey"),
+                        rs.getString("name")
+                ),
+                userKey
+        );
+    }
 }
