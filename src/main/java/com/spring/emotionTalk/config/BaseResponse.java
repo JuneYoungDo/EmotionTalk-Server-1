@@ -27,7 +27,7 @@ public class BaseResponse<T> {
     @JsonInclude(JsonInclude.Include.NON_DEFAULT)
     private T result;
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private String jwt;
+    private String accessToken;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String refreshToken;
 
@@ -49,8 +49,8 @@ public class BaseResponse<T> {
     }
 
     // jwt 토큰 요청
-    public BaseResponse(String jwt,String refreshToken) {
-        this.jwt = jwt;
+    public BaseResponse(String accessToken,String refreshToken) {
+        this.accessToken = accessToken;
         this.refreshToken=refreshToken;
     }
 

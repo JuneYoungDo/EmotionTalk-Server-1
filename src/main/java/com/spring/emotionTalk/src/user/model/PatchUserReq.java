@@ -1,6 +1,5 @@
 package com.spring.emotionTalk.src.user.model;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -8,9 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetUserRes {
-    private int userKey;
+public class PatchUserReq {
     private String userName;
-    private String email;
     private String photoUrl;
 }

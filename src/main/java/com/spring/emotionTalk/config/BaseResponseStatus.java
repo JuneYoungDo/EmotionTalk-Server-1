@@ -37,7 +37,8 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,2022,0,"정보가 일치하지 않습니다."),
 
     EMPTY_ID_TOKEN(false,400,2000,"ID_TOKEN이 없습니다."),
-
+    INVALID_USER_JWT(false,400,2001,"권한이 없습니다"),
+    MODIFY_FAIL_MY_PROFILE(false,400,2002,"프로필 수정에 실패하였습니다."),
 
 
     /**

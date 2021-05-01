@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sound.midi.Patch;
 import javax.sql.DataSource;
 
 import static com.spring.emotionTalk.config.BaseResponseStatus.*;
@@ -81,6 +82,19 @@ public class UserService {
             return 1;
         }
         return 0;
+    }
+
+    //PATCH
+    public void patchMyProfile(PatchUserReq patchUserReq,int userKey){
+        try{
+            int result = userDao.patchMyProfile(patchUserReq,userKey);
+            if(result == 0)
+            {
+                throw new BaseException(MODIFY_FAIL_MY_PROFILE);
+            }
+        } catch (BaseException exception) {
+            exception.printStackTrace();
+        }
     }
 
 }
