@@ -1,6 +1,7 @@
 package com.spring.emotionTalk.src.user;
 
 import com.spring.emotionTalk.config.BaseException;
+import com.spring.emotionTalk.config.BaseResponse;
 import com.spring.emotionTalk.config.secret.Secret;
 import com.spring.emotionTalk.src.user.model.*;
 import com.spring.emotionTalk.utils.AES128;
@@ -95,6 +96,30 @@ public class UserService {
         } catch (BaseException exception) {
             exception.printStackTrace();
         }
+    }
+
+    public BaseResponse chmodFriends(int userKey, int anotherKey){
+        String result = "";
+        if(userDao.isExistFriendList(userKey,anotherKey)==0) {
+            userDao.postFriendList(userKey,anotherKey); // 친구 추가
+            result = "친구목록에 추가하였습니다.";
+            return new BaseResponse(result);
+        }
+        else {
+            // 친구 목록에 있을 때
+            if(userDao.isDeletedFriend(userKey,anotherKey) == 'Y'){
+                userDao.chmodFriendList(userKey,anotherKey);    // 친구 추가
+                result = "친구목록에 추가하였습니다.";
+                return new BaseResponse(result);
+            }
+            else {
+                userDao.chmodFriendList(userKey,anotherKey);    // 친구 삭제
+                result = "친구목록에서 삭제하였습니다.";
+                return new BaseResponse(result);
+            }
+        }
+
+
     }
 
 }

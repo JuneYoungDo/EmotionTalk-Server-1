@@ -22,6 +22,8 @@ public enum BaseResponseStatus {
     INVALID_JWT(false, 2002,400, "유효하지 않은 JWT입니다."),
     EMPTY_ID_TOKEN(false,2003,400,"ID_TOKEN이 없습니다."),
     INVALID_INPUT(false,2004,400,"형식이 올바르지 않습니다."),
+    INVALID_USER_KEY(false,2005,400,"유효하지 않은 userKey 입니다."),
+    CAN_NOT_MY_SELF(false,2006,400,"나 자신을 지정할 수 없습니다."),
     // users
     USERS_EMPTY_USER_ID(false, 2010,0, "유저 아이디 값을 확인해주세요."),
 

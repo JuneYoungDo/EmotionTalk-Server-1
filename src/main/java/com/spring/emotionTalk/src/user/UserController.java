@@ -41,20 +41,6 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-
-    /**
-     * 회원 1명 조회 API
-     * [GET] /users/:userIdx
-     * @return BaseResponse<GetUserRes>
-    // Path-variable
-    @ResponseBody
-    @GetMapping("/user/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
-    public BaseResponse<GetUserRes> getUser(@PathVariable("userIdx") int userIdx) {
-        // Get Users
-        GetUserRes getUserRes = userProvider.getUser(userIdx);
-        return new BaseResponse<>(getUserRes);
-    }*/
-
     /**
      * 회원가입 API
      * [POST] /user
@@ -184,6 +170,81 @@ public class UserController {
 
             String result = "수정에 성공하였습니다.";
             return new BaseResponse(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 상대방 프로필 확인 API
+     * [GET] /user/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/user/{userKey}")
+    public BaseResponse<GetUserRes> getUserProfile(@PathVariable(name = "userKey") int userKey){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            GetUserRes getUserRes = userProvider.getUser(userKey);
+            if(getUserRes == null)
+                return new BaseResponse<>(INVALID_USER_KEY);
+
+            return new BaseResponse<>(getUserRes);
+
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 친구 추가
+     * [GET] /user/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/user/{userKey}/fd")
+    public BaseResponse<GetUserRes> chmodFriend(@PathVariable(name = "userKey") int userKey){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            GetUserRes getUserRes = userProvider.getUser(userKey);
+            if(getUserRes == null)
+                return new BaseResponse<>(INVALID_USER_KEY);
+
+            int anotherKey = getUserRes.getUserKey();
+
+            if(userKeyByJwt == anotherKey) {
+                return new BaseResponse<>(CAN_NOT_MY_SELF);
+            }
+            // 친구 추가 -> 리스트에 있는지 -> 없으면 추가
+            //                          -> 있으면 isDeleted 확인 -> 'Y' -> 'N' 으로 바꿈
+            //                                                  -> 'N' -> 'Y' 로 바꿈
+            BaseResponse baseResponse = userService.chmodFriends(userKeyByJwt,anotherKey);
+
+            return baseResponse;
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 친구 목록 보기
+     * [GET] /user/fdList
+     * @return BaseResponse<GetUserFdList>
+     */
+    @ResponseBody
+    @GetMapping("/user/fdList")
+    public BaseResponse<List<GetUserFriendListRes>> getUserFriendList(){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            List<GetUserFriendListRes> getUserFriendListRes = userProvider.getUserFriendList(userKeyByJwt);
+
+            return new BaseResponse<>(getUserFriendListRes);
         } catch(BaseException exception){
             return new BaseResponse<>((exception.getStatus()));
         }
