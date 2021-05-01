@@ -38,13 +38,9 @@ public class UserProvider {
         this.jwtService = jwtService;
     }
 
-    public List<GetUserRes> getUsers(String email){
-        List<GetUserRes> getUsersRes = userDao.getUsers(email);
-        return getUsersRes;
-    }
 
-    public GetUserRes getUser(int userIdx) {
-        GetUserRes getUserRes = userDao.getUser(userIdx);
+    public GetUserRes getUser(int userKey) {
+        GetUserRes getUserRes = userDao.getUser(userKey);
         return getUserRes;
     }
 

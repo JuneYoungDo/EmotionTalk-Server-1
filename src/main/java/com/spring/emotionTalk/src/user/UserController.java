@@ -41,28 +41,11 @@ public class UserController {
         this.jwtService = jwtService;
     }
 
-    /**
-     * 회원 조회 API
-     * [GET] /users
-     * 회원 번호 및 이메일 검색 조회 API
-     * [GET] /users?userIdx= && Email=
-     * @return BaseResponse<List<GetUserRes>>
-     */
-    //Query String
-    @ResponseBody
-    @GetMapping("/users") // (GET) 127.0.0.1:9000/app/users           @RequestParam = 쿼리스트링 받아옴
-                                            //                  required = false => 쿼리스트링 안받아도 오류 x
-    public BaseResponse<List<GetUserRes>> getUsers(@RequestParam(required = false) String Email) {
-        // Get Users
-        List<GetUserRes> getUsersRes = userProvider.getUsers(Email);
-        return new BaseResponse<>(getUsersRes);
-    }
 
     /**
      * 회원 1명 조회 API
      * [GET] /users/:userIdx
      * @return BaseResponse<GetUserRes>
-     */
     // Path-variable
     @ResponseBody
     @GetMapping("/user/{userIdx}") // (GET) 127.0.0.1:9000/app/users/:userIdx
@@ -70,7 +53,7 @@ public class UserController {
         // Get Users
         GetUserRes getUserRes = userProvider.getUser(userIdx);
         return new BaseResponse<>(getUserRes);
-    }
+    }*/
 
     /**
      * 회원가입 API
@@ -118,16 +101,6 @@ public class UserController {
         }
     }
 
-    /*@ResponseBody
-    @GetMapping("/jwt/test")
-    public boolean testJWT() throws BaseException, UnsupportedEncodingException {
-        boolean flag;
-        flag = jwtService.verifyJWT(jwtService.getJwt());
-        System.out.println(flag);
-        return flag;
-    }*/
-
-
     /**
      * 소셜 로그인 API
      * [POST] /{socialLoginType}/login
@@ -156,7 +129,7 @@ public class UserController {
                 System.out.println("loginUser");
                 try {
                     postLoginRes = userProvider.logIn(googleUserReq.getEmail());
-                    return new BaseResponse<>(postLoginRes.getJwt(),postLoginRes.getRefreshToken());
+                    return new BaseResponse<>(postLoginRes.getAccessToken(),postLoginRes.getRefreshToken());
                 } catch (BaseException exception) {
                     return new BaseResponse<>(exception.getStatus());
                 }
@@ -164,7 +137,7 @@ public class UserController {
                 System.out.println("createUser");
                 try {
                     postLoginRes = userService.createUserByGoogle(googleUserReq);
-                    return new BaseResponse<>(postLoginRes.getJwt(), postLoginRes.getRefreshToken());
+                    return new BaseResponse<>(postLoginRes.getAccessToken(), postLoginRes.getRefreshToken());
                 } catch (BaseException exception) {
                     return new BaseResponse<>(exception.getStatus());
                 }
@@ -172,5 +145,45 @@ public class UserController {
         }
     }
 
+    /**
+     * 내 프로필 확인 API
+     * [GET] /user/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/user")
+    public BaseResponse<GetUserRes> getMyProfile(){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+            // Get Users
+            GetUserRes getUserRes = userProvider.getUser(userKeyByJwt);
+            return new BaseResponse<>(getUserRes);
+
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 내 프로필 수정 API
+     * [PATCH] /user
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @PatchMapping("/user")
+    public BaseResponse<GetUserRes> patchMyProfile(@RequestBody PatchUserReq patchUserReq){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            userService.patchMyProfile(patchUserReq,userKeyByJwt);
+
+            String result = "수정에 성공하였습니다.";
+            return new BaseResponse(result);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
 
 }

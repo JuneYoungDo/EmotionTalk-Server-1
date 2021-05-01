@@ -19,26 +19,16 @@ public class UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public List<GetUserRes> getUsers(String email){
-        return this.jdbcTemplate.query("select * from UserInfo where email =?",
-                (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("userName"),
-                        rs.getString("ID"),
-                        rs.getString("Email"),
-                        rs.getString("password")),
-                email);
-    }
 
-    public GetUserRes getUser(int userIdx){
-        return this.jdbcTemplate.queryForObject("select * from UserInfo where userIdx = ?",
+    public GetUserRes getUser(int userKey){
+        return this.jdbcTemplate.queryForObject("select userKey,name, email,photoUrl from user where userKey = ? " +
+                                                        "and isDeleted ='N';",
                 (rs, rowNum) -> new GetUserRes(
-                        rs.getInt("userIdx"),
-                        rs.getString("userName"),
-                        rs.getString("ID"),
-                        rs.getString("Email"),
-                        rs.getString("password")),
-                userIdx);
+                        rs.getInt("userKey"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("photoUrl")),
+                userKey);
     }
 
 
@@ -105,6 +95,12 @@ public class UserDao {
                 ),
                 getPwdParams
         );
+    }
+
+    public int patchMyProfile(PatchUserReq patchUserReq,int userKey){
+        String patchMyProfileQuery = "UPDATE user SET name = ?, photoUrl = ? WHERE userKey = ?;";
+        Object[] patchMyProfileParams = new Object[]{patchUserReq.getUserName(), patchUserReq.getPhotoUrl(),userKey};
+        return this.jdbcTemplate.update(patchMyProfileQuery,patchMyProfileParams);
     }
 
 

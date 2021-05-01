@@ -105,7 +105,6 @@ public class JwtService {
         if(accessToken == null || accessToken.length() == 0){
             throw new BaseException(EMPTY_JWT);
         }
-
         // 2. JWT parsing
         Jws<Claims> claims;
         try{
