@@ -13,7 +13,7 @@ import static com.spring.emotionTalk.config.BaseResponseStatus.SUCCESS;
 
 @Getter
 @AllArgsConstructor
-@JsonPropertyOrder({"isSuccess","status", "code", "message", "result"})
+@JsonPropertyOrder({"isSuccess","code", "status", "message", "result"})
 public class BaseResponse<T> {
     @JsonProperty("isSuccess")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -33,10 +33,10 @@ public class BaseResponse<T> {
 
     // 요청에 성공한 경우
     public BaseResponse(T result) {
-        this.isSuccess = SUCCESS.isSuccess();
-        this.message = SUCCESS.getMessage();
+    //    this.isSuccess = SUCCESS.isSuccess();
+    //    this.message = SUCCESS.getMessage();
         this.code = SUCCESS.getCode();
-        this.status = SUCCESS.getStatus();
+    //    this.status = SUCCESS.getStatus();
         this.result = result;
     }
 
@@ -44,8 +44,8 @@ public class BaseResponse<T> {
     public BaseResponse(BaseResponseStatus status) {
         this.isSuccess = status.isSuccess();
         this.message = status.getMessage();
-        this.status = status.getStatus();
         this.code = status.getCode();
+        this.status = status.getStatus();
     }
 
     // jwt 토큰 요청

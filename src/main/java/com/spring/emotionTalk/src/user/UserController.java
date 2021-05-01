@@ -177,6 +177,9 @@ public class UserController {
             //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
 
+            if(patchUserReq.getUserName() == null || patchUserReq.getPhotoUrl() == null)
+                return new BaseResponse<>(INVALID_INPUT);
+
             userService.patchMyProfile(patchUserReq,userKeyByJwt);
 
             String result = "수정에 성공하였습니다.";

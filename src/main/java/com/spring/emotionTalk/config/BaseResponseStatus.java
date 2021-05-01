@@ -17,10 +17,11 @@ public enum BaseResponseStatus {
      * 2000 : Request 오류
      */
     // Common
-    REQUEST_ERROR(false, 400,2000, "입력값을 확인해주세요."),
-    EMPTY_JWT(false, 2001,0, "JWT를 입력해주세요."),
-    INVALID_JWT(false, 2002,0, "유효하지 않은 JWT입니다."),
-
+    REQUEST_ERROR(false, 2000,400, "입력값을 확인해주세요."),
+    EMPTY_JWT(false, 2001,400, "JWT를 입력해주세요."),
+    INVALID_JWT(false, 2002,400, "유효하지 않은 JWT입니다."),
+    EMPTY_ID_TOKEN(false,2003,400,"ID_TOKEN이 없습니다."),
+    INVALID_INPUT(false,2004,400,"형식이 올바르지 않습니다."),
     // users
     USERS_EMPTY_USER_ID(false, 2010,0, "유저 아이디 값을 확인해주세요."),
 
@@ -36,9 +37,6 @@ public enum BaseResponseStatus {
     USER_IS_NOT_AVAILABLE(false,2021,0,"삭제된 계정입니다."),
     FAILED_TO_LOGIN(false,2022,0,"정보가 일치하지 않습니다."),
 
-    EMPTY_ID_TOKEN(false,400,2000,"ID_TOKEN이 없습니다."),
-    INVALID_USER_JWT(false,400,2001,"권한이 없습니다"),
-    MODIFY_FAIL_MY_PROFILE(false,400,2002,"프로필 수정에 실패하였습니다."),
 
 
     /**
@@ -46,6 +44,8 @@ public enum BaseResponseStatus {
      */
     // Common
     RESPONSE_ERROR(false, 3000,0, "값을 불러오는데 실패하였습니다."),
+    INVALID_USER_JWT(false,3000,400,"권한이 없습니다"),
+    MODIFY_FAIL_MY_PROFILE(false,3001,400,"프로필 수정에 실패하였습니다."),
 
     // [POST] /users
     DUPLICATED_EMAIL(false, 3013,0, "중복된 이메일입니다."),
