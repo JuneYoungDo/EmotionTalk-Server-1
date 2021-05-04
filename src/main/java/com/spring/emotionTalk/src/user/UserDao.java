@@ -132,13 +132,14 @@ public class UserDao {
         this.jdbcTemplate.update(chmodFriendList,userKey,anotherKey);
     }
     public List<GetUserFriendListRes> getUserFriendList(int userKey){
-        String getUserFriendListQuery = "select anotherKey, name from friendList, user " +
+        String getUserFriendListQuery = "select anotherKey, name,photoUrl from friendList, user " +
                 "where friendList.anotherKey = user.userKey and friendList.userKey = ?;";
 
         return this.jdbcTemplate.query(getUserFriendListQuery,
                 (rs, rowNum) -> new GetUserFriendListRes(
                         rs.getInt("anotherKey"),
-                        rs.getString("name")
+                        rs.getString("name"),
+                        rs.getString("photoUrl")
                 ),
                 userKey
         );

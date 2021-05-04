@@ -10,4 +10,5 @@ import lombok.Setter;
 public class GetUserFriendListRes {
         private int anotherKey;
         private String name;
+        private  String photoUrl;
 }
