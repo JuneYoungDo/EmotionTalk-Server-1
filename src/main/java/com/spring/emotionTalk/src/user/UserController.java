@@ -132,26 +132,6 @@ public class UserController {
     }
 
     /**
-     * 내 프로필 확인 API
-     * [GET] /user/:userIdx
-     * @return BaseResponse<GetUserRes>
-     */
-    @ResponseBody
-    @GetMapping("/user")
-    public BaseResponse<GetUserRes> getMyProfile(){
-        try{
-            //jwt에서 idx 추출.
-            int userKeyByJwt = jwtService.getUserKey();
-            // Get Users
-            GetUserRes getUserRes = userProvider.getUser(userKeyByJwt);
-            return new BaseResponse<>(getUserRes);
-
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
-        }
-    }
-
-    /**
      * 내 프로필 수정 API
      * [PATCH] /user
      * @return BaseResponse<GetUserRes>
@@ -176,13 +156,13 @@ public class UserController {
     }
 
     /**
-     * 상대방 프로필 확인 API
+     * 프로필 확인 API
      * [GET] /user/:userIdx
      * @return BaseResponse<GetUserRes>
      */
     @ResponseBody
-    @GetMapping("/user/{userKey}")
-    public BaseResponse<GetUserRes> getUserProfile(@PathVariable(name = "userKey") int userKey){
+    @GetMapping("/user")
+    public BaseResponse<GetUserRes> getUserProfile(@RequestParam(value = "userKey") int userKey){
         try{
             //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
