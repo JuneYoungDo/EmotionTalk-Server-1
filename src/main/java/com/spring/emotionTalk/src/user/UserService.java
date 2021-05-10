@@ -86,9 +86,9 @@ public class UserService {
     }
 
     //PATCH
-    public void patchMyProfile(PatchUserReq patchUserReq,int userKey){
+    public void patchMyProfile(PatchUserReq patchUserReq,int userKey,String filePath){
         try{
-            int result = userDao.patchMyProfile(patchUserReq,userKey);
+            int result = userDao.patchMyProfile(patchUserReq,userKey,filePath);
             if(result == 0)
             {
                 throw new BaseException(MODIFY_FAIL_MY_PROFILE);

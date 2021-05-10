@@ -30,6 +30,7 @@ public enum BaseResponseStatus {
     INVALID_INPUT(false,2004,"형식이 올바르지 않습니다.",new Timestamp(System.currentTimeMillis())),
     INVALID_USER_KEY(false,2005,"유효하지 않은 userKey 입니다.",new Timestamp(System.currentTimeMillis())),
     CAN_NOT_MY_SELF(false,2006,"나 자신을 지정할 수 없습니다.",new Timestamp(System.currentTimeMillis())),
+    EMPTY_REFRESH_TOKEN(false,2007,"REFRESH_TOKEN이 없습니다.",new Timestamp(System.currentTimeMillis())),
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요.",new Timestamp(System.currentTimeMillis())),
 
