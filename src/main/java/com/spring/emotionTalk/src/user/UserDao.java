@@ -56,6 +56,11 @@ public class UserDao {
         );
     }
 
+    public String getRefreshToken(int userKey){
+        return this.jdbcTemplate.queryForObject("select refreshToken from user where userKey =?;",
+                String.class, userKey);
+    }
+
     public int checkGoogleEmail(String googleEmail) {
         return this.jdbcTemplate.queryForObject("select exists(select email from user where email = ? and isDeleted = 'N')",
                 int.class, googleEmail);
@@ -97,9 +102,9 @@ public class UserDao {
         );
     }
 
-    public int patchMyProfile(PatchUserReq patchUserReq,int userKey){
+    public int patchMyProfile(PatchUserReq patchUserReq,int userKey, String filePath){
         String patchMyProfileQuery = "UPDATE user SET name = ?, photoUrl = ? WHERE userKey = ?;";
-        Object[] patchMyProfileParams = new Object[]{patchUserReq.getUserName(), patchUserReq.getPhotoUrl(),userKey};
+        Object[] patchMyProfileParams = new Object[]{patchUserReq.getUserName(), filePath,userKey};
         return this.jdbcTemplate.update(patchMyProfileQuery,patchMyProfileParams);
     }
 
@@ -131,6 +136,7 @@ public class UserDao {
         }
         this.jdbcTemplate.update(chmodFriendList,userKey,anotherKey);
     }
+
     public List<GetUserFriendListRes> getUserFriendList(int userKey){
         String getUserFriendListQuery = "select anotherKey, name,photoUrl from friendList, user " +
                 "where friendList.anotherKey = user.userKey and friendList.userKey = ?;";
@@ -144,4 +150,19 @@ public class UserDao {
                 userKey
         );
     }
+
+    public List<GetUserFindRes> getUserSearchList(String name){
+        String getUserSearchListQuery = "select name, email from user where name LIKE concat(?,\"%\");";
+
+        return this.jdbcTemplate.query(getUserSearchListQuery,
+                (rs,rowNum)->new GetUserFindRes(
+                        rs.getString("name"),
+                        rs.getString("email")
+                ),
+                name
+        );
+    }
+
+
+
 }

@@ -1,5 +1,6 @@
     package com.spring.emotionTalk.src.user;
 
+import com.spring.emotionTalk.src.S3Service;
 import com.spring.emotionTalk.src.auth.dto.AuthDto;
 import com.spring.emotionTalk.src.auth.helper.constants.SocialLoginType;
 import com.spring.emotionTalk.src.auth.service.OauthService;
@@ -11,10 +12,11 @@ import com.spring.emotionTalk.src.user.model.*;
 import com.spring.emotionTalk.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.websocket.server.PathParam;
 import java.io.IOException;
 
-import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
@@ -26,19 +28,22 @@ import static com.spring.emotionTalk.config.BaseResponseStatus.*;
 public class UserController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final OauthService oauthService;
-
     @Autowired
     private final UserProvider userProvider;
     @Autowired
     private final UserService userService;
     @Autowired
     private final JwtService jwtService;
+    @Autowired
+    private final S3Service s3Service;
 
-    public UserController(OauthService oauthService, UserProvider userProvider, UserService userService, JwtService jwtService){
+    public UserController(OauthService oauthService, UserProvider userProvider, UserService userService,
+                          JwtService jwtService, S3Service s3Service){
         this.oauthService = oauthService;
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
+        this.s3Service = s3Service;
     }
 
     /**
@@ -132,32 +137,78 @@ public class UserController {
     }
 
     /**
+     * refreshToken을 통한 accessToken 재발급
+     * [POST] /{socialLoginType}/login/refresh
+     * @param socialLoginType (GOOGLE, KAKAO)
+     */
+    @ResponseBody
+    @PostMapping("/{socialLoginType}/login/refresh")
+    public BaseResponse<PostLoginRes> renewalToken(
+            @RequestBody GetRefreshTokenReq getRefreshTokenReq,
+            @PathVariable(name = "socialLoginType") SocialLoginType socialLoginType) throws GeneralSecurityException, IOException, BaseException {
+
+        String refreshToken = getRefreshTokenReq.getRefreshToken();
+        if (refreshToken == "") {
+            return new BaseResponse<>(EMPTY_REFRESH_TOKEN);
+        } else {
+            // refreshToken 유효성 검사
+            if(jwtService.verifyJWT(refreshToken) == true){
+                PostLoginRes postLoginRes=new PostLoginRes();
+
+                int userKey = jwtService.getUserKeyFromRefreshToken(refreshToken);
+                String tokenInDB = userProvider.getRefreshToken(userKey);
+
+                // refreshToken과 DB refreshToken 비교
+                if(refreshToken.equals(tokenInDB)){
+                    String accessToken = jwtService.createJwt(userKey);
+                    postLoginRes.setAccessToken(accessToken);
+                    return new BaseResponse<>(postLoginRes.getAccessToken(),postLoginRes.getRefreshToken());
+                }
+                else{
+                    return new BaseResponse<>(INVALID_JWT);
+                }
+
+            }
+            else{
+                return new BaseResponse<>(INVALID_JWT);
+            }
+        }
+    }
+
+
+
+    /**
      * 내 프로필 수정 API
      * [PATCH] /user
      * @return BaseResponse<GetUserRes>
      */
     @ResponseBody
     @PatchMapping("/user")
-    public BaseResponse<GetUserRes> patchMyProfile(@RequestBody PatchUserReq patchUserReq){
+    public BaseResponse<GetUserRes> patchMyProfile(@RequestPart (value = "file", required = false) MultipartFile multipartFile
+                                                   ,@RequestParam (value = "userName") PatchUserReq patchUserReq){
         try{
-            //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
 
-            if(patchUserReq.getUserName() == null || patchUserReq.getPhotoUrl() == null)
+            if(patchUserReq.getUserName() == null || multipartFile == null)
                 return new BaseResponse<>(INVALID_INPUT);
 
-            userService.patchMyProfile(patchUserReq,userKeyByJwt);
+            S3Service S3Service = new S3Service();
+            String filePath = S3Service.upload(multipartFile);
+
+            userService.patchMyProfile(patchUserReq, userKeyByJwt,filePath);
 
             String result = "수정에 성공하였습니다.";
             return new BaseResponse(result);
-        } catch(BaseException exception){
-            return new BaseResponse<>((exception.getStatus()));
+        } catch(BaseException baseException){
+            return new BaseResponse(baseException.getStatus());
+        }catch(IOException ioException){
+            return new BaseResponse(ioException.getCause());
         }
     }
 
     /**
      * 프로필 확인 API
-     * [GET] /user/:userIdx
+     * [GET] /user?userKey={userKey}
      * @return BaseResponse<GetUserRes>
      */
     @ResponseBody
@@ -179,13 +230,36 @@ public class UserController {
     }
 
     /**
-     * 친구 추가
-     * [GET] /user/:userIdx
+     * 유저 찾기
+     * [GET] /user/id?userName={name}
      * @return BaseResponse<GetUserRes>
      */
     @ResponseBody
-    @GetMapping("/user/{userKey}/fd")
-    public BaseResponse<GetUserRes> chmodFriend(@PathVariable(name = "userKey") int userKey){
+    @GetMapping("/user/id")
+    public BaseResponse<List<GetUserFindRes>> getUserSearch(@RequestParam(value = "userName") String name){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            if(name.equals(""))
+                return new BaseResponse("No Data");
+
+            List<GetUserFindRes> getUserFindRes = userProvider.getUserSearchList(name);
+
+            return new BaseResponse<>(getUserFindRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
+     * 친구 추가
+     * [GET] /user/fd?userKey={userKey}
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/user/fd")
+    public BaseResponse<GetUserRes> chmodFriend(@RequestParam(name = "userKey") int userKey){
         try{
             //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
@@ -229,5 +303,7 @@ public class UserController {
             return new BaseResponse<>((exception.getStatus()));
         }
     }
+
+
 
 }

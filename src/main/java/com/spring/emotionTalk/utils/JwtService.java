@@ -70,13 +70,13 @@ public class JwtService {
 
 
     /*
-   JWT 검증
+   JWT 검증(refreshToken)
     */
     public Boolean verifyJWT(String jwt) throws UnsupportedEncodingException {
 
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
+                    .setSigningKey(Secret.REFRESH_SECRET_KEY)// refreshToken 검증
                     .parseClaimsJws(jwt) // 파싱 및 검증, 실패 시 에러
                     .getBody();
 
@@ -118,5 +118,22 @@ public class JwtService {
         // 3. userIdx 추출
         return claims.getBody().get("userKey",Integer.class);
     }
+
+    public int getUserKeyFromRefreshToken(String refreshToken) throws BaseException {
+
+        // 2. JWT parsing
+        Jws<Claims> claims;
+        try{
+            claims = Jwts.parser()
+                    .setSigningKey(Secret.REFRESH_SECRET_KEY)
+                    .parseClaimsJws(refreshToken);
+        } catch (Exception ignored) {
+            throw new BaseException(INVALID_JWT);
+        }
+
+        // 3. userIdx 추출
+        return claims.getBody().get("userKey",Integer.class);
+    }
+
 
 }

@@ -15,7 +15,7 @@ import static com.spring.emotionTalk.config.BaseResponseStatus.SUCCESS;
 
 @Getter
 @AllArgsConstructor
-@JsonPropertyOrder({"isSuccess","code", "message", "result","timeStamp"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class BaseResponse<T> {
     @JsonProperty("isSuccess")
     @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -30,8 +30,10 @@ public class BaseResponse<T> {
     private T result;
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String accessToken;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String refreshToken;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Timestamp timestamp;
 
@@ -54,10 +56,10 @@ public class BaseResponse<T> {
     }
 
     // jwt 토큰 요청
+
     public BaseResponse(String accessToken,String refreshToken) {
         this.accessToken = accessToken;
-        this.refreshToken=refreshToken;
+        this.refreshToken = refreshToken;
     }
-
 }
 
