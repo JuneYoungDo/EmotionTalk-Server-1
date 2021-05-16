@@ -152,10 +152,11 @@ public class UserDao {
     }
 
     public List<GetUserFindRes> getUserSearchList(String name){
-        String getUserSearchListQuery = "select name, email from user where name LIKE concat(?,\"%\");";
+        String getUserSearchListQuery = "select userKey,name, email from user where name LIKE concat(?,\"%\");";
 
         return this.jdbcTemplate.query(getUserSearchListQuery,
                 (rs,rowNum)->new GetUserFindRes(
+                        rs.getInt("userKey"),
                         rs.getString("name"),
                         rs.getString("email")
                 ),
@@ -163,6 +164,9 @@ public class UserDao {
         );
     }
 
-
+    public void insertDeviceToken(int userKey,String deviceToken){
+        String updateDeviceToken = "UPDATE user SET deviceToken = ? WHERE (userKey = ?);";
+        this.jdbcTemplate.update(updateDeviceToken,new Object[]{deviceToken,userKey});
+    }
 
 }

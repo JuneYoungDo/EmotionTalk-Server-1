@@ -19,14 +19,15 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public class FirebaseCloudMessageService {
 
-    private final String API_URL = "https://fcm.googleapis.com/v1/projects/emotiontalk-springboot/messages:send";
+    private final String API_URL = "https://fcm.googleapis.com/v1/projects/emotiontalk-dcc75/messages:send";
     private final ObjectMapper objectMapper;
 
-    public void sendMessageTo(String targetToken, String title, String body) throws IOException {
-        String message = makeMessage(targetToken, title, body);
+    public void sendMessageTo(String targetToken, String title, String body,String img) throws IOException {
+        String message = makeMessage(targetToken, title, body,img);
 
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = RequestBody.create(message, MediaType.get("application/json; charset=utf-8"));
+
         Request request = new Request.Builder()
                 .url(API_URL)
                 .post(requestBody)
@@ -39,14 +40,14 @@ public class FirebaseCloudMessageService {
         System.out.println(response.body().string());
     }
 
-    private String makeMessage(String targetToken, String title, String body) throws JsonProcessingException {
+    private String makeMessage(String targetToken, String title, String body,String img) throws JsonProcessingException {
         FcmMessageDto fcmMessage = FcmMessageDto.builder()
                 .message(FcmMessageDto.Message.builder()
                         .token(targetToken)
                         .notification(FcmMessageDto.Notification.builder()
                                 .title(title)
                                 .body(body)
-                                .image(null)
+                                .image(img)
                                 .build()
                         )
                         .build()
@@ -59,7 +60,7 @@ public class FirebaseCloudMessageService {
     }
 
     private String getAccessToken() throws IOException {
-        String firebaseConfigPath = "firebase/emotiontalk-springboot-firebase-adminsdk-y6jjq-89bea80665.json";
+        String firebaseConfigPath = "firebase/emotiontalk-dcc75-firebase-adminsdk-odl3m-de917e4c0a.json";
 
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())

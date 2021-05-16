@@ -8,6 +8,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetUserFindRes {
+    private int userKey;
     private String name;
     private String email;
 }

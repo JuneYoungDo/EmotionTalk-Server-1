@@ -11,11 +11,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 
-import static com.spring.emotionTalk.config.BaseResponseStatus.POST_USER_EMPTY_NAME;
-import static com.spring.emotionTalk.config.BaseResponseStatus.POST_USER_EMPTY_PWD;
+import static com.spring.emotionTalk.config.BaseResponseStatus.*;
 
 @RestController
 @RequestMapping("/app")
@@ -41,13 +41,23 @@ public class FcmMessageController {
 
     @ResponseBody
     @PostMapping("/chat")
-    public String sendMessage(@RequestBody PostMessageReq postMessageReq) throws IOException {
+    public BaseResponse sendMessage(@RequestPart (value="imgFile", required = false) MultipartFile imgFile,
+                                    @RequestParam (value="targetToken") String targetToken,
+                                    @RequestParam (value="title") String title,
+                                    @RequestParam (value="body") String body
+                                    ) throws IOException, BaseException {
 
-        firebaseCloudMessageService.sendMessageTo(postMessageReq.getTargetToken(),
-                postMessageReq.getTitle(), postMessageReq.getBody());
+        int userKeyByJwt = jwtService.getUserKey();
+        if(imgFile == null || targetToken == null || title == null || body == null)
+            return new BaseResponse<>(INVALID_INPUT);
 
+        S3Service s3Service = new S3Service();
+        String img = s3Service.upload(imgFile);
 
-        return "";
+        firebaseCloudMessageService.sendMessageTo(targetToken, title, body,img);
+
+        String result = "전송하였습니다.";
+        return new BaseResponse(result);
     }
 
 }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.jdbc.core.JdbcTemplate;
 
-import javax.sound.midi.Patch;
 import javax.sql.DataSource;
 
 import static com.spring.emotionTalk.config.BaseResponseStatus.*;
@@ -118,8 +117,15 @@ public class UserService {
                 return new BaseResponse(result);
             }
         }
+    }
 
+    //POST
+    public BaseResponse updateDeviceToken(int userKey,String deviceToken){
 
+        userDao.insertDeviceToken(userKey,deviceToken);
+        String result = "deviceToken이 수정되었습니다.";
+
+        return new BaseResponse(result);
     }
 
 }
