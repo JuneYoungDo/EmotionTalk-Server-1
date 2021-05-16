@@ -230,6 +230,26 @@ public class UserController {
     }
 
     /**
+     * 본인 프로필 확인 API
+     * [GET] /user
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/user/self")
+    public BaseResponse<GetUserRes> getMyProfile(){
+        try{
+            //jwt에서 idx 추출.
+            int userKeyByJwt = jwtService.getUserKey();
+
+            GetUserRes getUserRes = userProvider.getUser(userKeyByJwt);
+            return new BaseResponse<>(getUserRes);
+
+        } catch(BaseException exception){
+            return new BaseResponse<>((exception.getStatus()));
+        }
+    }
+
+    /**
      * 유저 찾기
      * [GET] /user/id?userName={name}
      * @return BaseResponse<GetUserRes>
