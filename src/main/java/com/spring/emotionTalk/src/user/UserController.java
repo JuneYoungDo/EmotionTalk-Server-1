@@ -330,7 +330,7 @@ public class UserController {
      */
     @ResponseBody
     @PatchMapping("/user/deviceToken")
-    public BaseResponse editDeviceToken(@RequestParam (value="deviceToken", required = false) String deviceToken){
+    public BaseResponse editDeviceToken(@RequestBody String deviceToken){
         try{
             //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
