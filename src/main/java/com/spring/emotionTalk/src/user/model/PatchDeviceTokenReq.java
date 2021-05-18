@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PatchUserReq {
-    private String userName;
+public class PatchDeviceTokenReq {
+    private String deviceToken;
+    public PatchDeviceTokenReq(){}
 }

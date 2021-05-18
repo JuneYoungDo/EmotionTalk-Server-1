@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PatchUserReq {
-    private String userName;
+public class GetUserFriendListRes {
+        private int anotherKey;
+        private String name;
+        private  String photoUrl;
 }

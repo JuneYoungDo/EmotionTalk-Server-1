@@ -40,8 +40,15 @@ public class UserProvider {
 
 
     public GetUserRes getUser(int userKey) {
-        GetUserRes getUserRes = userDao.getUser(userKey);
-        return getUserRes;
+        if(userDao.isValidUserKey(userKey) == 0)
+        {
+            GetUserRes getUserRes = null;
+            return getUserRes;
+        }
+        else {
+            GetUserRes getUserRes = userDao.getUser(userKey);
+            return getUserRes;
+        }
     }
 
     public int checkEmail(String email) {
@@ -92,5 +99,23 @@ public class UserProvider {
 
         return new PostLoginRes(jwt,refreshToken);
     }
+
+    public String getRefreshToken(int userKey){
+        return userDao.getRefreshToken(userKey);
+    }
+
+
+    public List<GetUserFriendListRes> getUserFriendList(int userKey) {
+        List<GetUserFriendListRes> getUserFriendListRes = userDao.getUserFriendList(userKey);
+
+        return getUserFriendListRes;
+    }
+
+    public List<GetUserFindRes> getUserSearchList(String name){
+        List<GetUserFindRes> getUserFindRes = userDao.getUserSearchList(name);
+
+        return getUserFindRes;
+    }
+
 
 }

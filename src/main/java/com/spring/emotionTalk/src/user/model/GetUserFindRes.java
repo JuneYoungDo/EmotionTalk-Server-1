@@ -7,6 +7,8 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PatchUserReq {
-    private String userName;
+public class GetUserFindRes {
+    private int userKey;
+    private String name;
+    private String email;
 }

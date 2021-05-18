@@ -64,7 +64,6 @@ public class GoogleOauth implements SocialOauth {
     @Override
     public String requestAccessToken(String code) {
         RestTemplate restTemplate = new RestTemplate();
-
         Map<String, Object> params = new HashMap<>();
         params.put("client_id", GOOGLE_SNS_CLIENT_ID);
         params.put("client_secret", GOOGLE_SNS_CLIENT_SECRET);
