@@ -74,7 +74,7 @@ public class FcmMessageController {
                 myDeviceToken,
                 fcmProvider.getUserNameByUserKey(userKey),
                 fcmProvider.getUserNameByUserKey(anotherKey),
-                "",
+                "이미지 전송",
                 img,
                 "",
                 now);
@@ -83,7 +83,7 @@ public class FcmMessageController {
                 anotherDeviceToken,
                 fcmProvider.getUserNameByUserKey(userKey),
                 fcmProvider.getUserNameByUserKey(anotherKey),
-                "",
+                "이미지 전송",
                 img,
                 "",
                 now);
