@@ -326,19 +326,19 @@ public class UserController {
 
     /**
      * deviceToken 추가
-     * [POST] /user/deviceToken
+     * [PATCH] /user/deviceToken
      */
     @ResponseBody
     @PatchMapping("/user/deviceToken")
-    public BaseResponse editDeviceToken(@RequestBody String deviceToken){
+    public BaseResponse editDeviceToken(@RequestBody PatchDeviceTokenReq patchDeviceTokenReq){
         try{
             //jwt에서 idx 추출.
             int userKeyByJwt = jwtService.getUserKey();
 
-            if(deviceToken == null)
+            if(patchDeviceTokenReq.getDeviceToken() == null)
                 return new BaseResponse<>(INVALID_INPUT);
 
-            BaseResponse baseResponse = userService.updateDeviceToken(userKeyByJwt,deviceToken);
+            BaseResponse baseResponse = userService.updateDeviceToken(userKeyByJwt,patchDeviceTokenReq.getDeviceToken());
 
             return baseResponse;
         } catch(BaseException exception){
