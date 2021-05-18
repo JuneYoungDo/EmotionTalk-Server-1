@@ -1,9 +1,11 @@
 package com.spring.emotionTalk.src.fcm;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import com.google.firebase.messaging.Message;
+import lombok.*;
+
+import javax.xml.crypto.Data;
+import java.sql.Timestamp;
+import java.util.Map;
 
 @Builder
 @AllArgsConstructor
@@ -19,6 +21,7 @@ public class FcmMessageDto {
     @Setter
     public static class Message{
         Notification notification;
+        private Map data;
         private String token;
     }
 
@@ -27,8 +30,8 @@ public class FcmMessageDto {
     @Getter
     @Setter
     public static class Notification{
-        private String title;
+//        private String title;
         private String body;
-        private String image;
     }
+
 }
