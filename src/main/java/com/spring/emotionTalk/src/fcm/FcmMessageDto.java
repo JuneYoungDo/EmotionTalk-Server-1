@@ -23,6 +23,7 @@ public class FcmMessageDto {
         Notification notification;
         private Map data;
         private String token;
+        Apns apns;
     }
 
     @Builder
@@ -33,5 +34,28 @@ public class FcmMessageDto {
 //        private String title;
         private String body;
     }
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class Apns{
+        Payload payload;
+    }
 
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class Payload{
+        Aps aps;
+    }
+
+    @Builder
+    @AllArgsConstructor
+    @Getter
+    @Setter
+    public static class Aps{
+        private int mutable_content;
+    }
 }
