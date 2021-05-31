@@ -111,8 +111,8 @@ public class FcmMessageController {
         String myDeviceToken = fcmProvider.getDeviceTokenByUserKey(userKeyByJwt);
         String anotherDeviceToken = fcmProvider.getDeviceTokenByUserKey(postChatReq.getAnotherKey());
 
-        firebaseCloudMessageService.sendMessageTo
-                (anotherDeviceToken,
+        firebaseCloudMessageService.sendMessageTo(
+                anotherDeviceToken,
                 fcmProvider.getUserNameByUserKey(userKeyByJwt),
                 fcmProvider.getUserNameByUserKey(postChatReq.getAnotherKey()),
                 postChatReq.getContents(),
