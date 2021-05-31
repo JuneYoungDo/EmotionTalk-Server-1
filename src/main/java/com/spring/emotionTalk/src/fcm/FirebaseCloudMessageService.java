@@ -5,15 +5,16 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.api.client.auth.openidconnect.IdToken;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.google.firebase.messaging.FirebaseMessaging;
-import com.google.firebase.messaging.FirebaseMessagingException;
-import com.google.firebase.messaging.Message;
-import com.google.firebase.messaging.Notification;
+import com.google.firebase.auth.internal.FirebaseCustomAuthToken;
+import com.google.firebase.messaging.*;
 import com.spring.emotionTalk.src.user.model.User;
+import com.turo.pushy.apns.util.ApnsPayloadBuilder;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import okhttp3.internal.ws.RealWebSocket;
+import org.apache.http.Header;
 import org.apache.http.HttpHeaders;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
@@ -31,7 +32,7 @@ import java.util.Map;
 public class FirebaseCloudMessageService {
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/emotiontalk-dcc75/messages:send";
-    private final ObjectMapper objectMapper;
+//    private final ObjectMapper objectMapper;
 
 
     public void sendMessageTo(String targetToken,String sender,String receiver, String contents,String img,
@@ -57,7 +58,7 @@ public class FirebaseCloudMessageService {
     private String makeMessage(String targetToken,String sender,String receiver, String contents,String img,
                                String emotion, Timestamp atTime) throws JsonProcessingException{
 
-        HashMap<String,String > map = new HashMap<String,String>();
+        HashMap map = new HashMap();
 
         map.put("sender",sender);
         map.put("receiver",receiver);
@@ -69,20 +70,22 @@ public class FirebaseCloudMessageService {
         FcmMessageDto fcmMessage = FcmMessageDto.builder()
                 .message(FcmMessageDto.Message.builder()
                         .notification(FcmMessageDto.Notification.builder()
-                                .body(contents)
+                                .body(sender + " : " + contents)
                                 .build())
-                        .apns(FcmMessageDto.Apns.builder()
-                                .payload(FcmMessageDto.Payload.builder()
-                                        .aps(FcmMessageDto.Aps.builder()
-                                                .mutable_content(1)
-                                                .build())
+                        .apns(ApnsConfig.builder()
+                                .setAps(Aps.builder()
+                                        .setMutableContent(true)
                                         .build())
-                            .build())
+                                .build())
                         .token(targetToken)
                         .data(map)
                         .build())
                 .validate_only(false)
                 .build();
+
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.setVisibility(PropertyAccessor.FIELD,JsonAutoDetect.Visibility.ANY);
 
         System.out.println(objectMapper.writeValueAsString(fcmMessage));
         return objectMapper.writeValueAsString(fcmMessage);
